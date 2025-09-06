@@ -18,7 +18,7 @@ DJANGO_INSTALLED_APPS = [
     "django.contrib.staticfiles",
 ]
 
-LOCAL_APPS = ["apps.users", "apps.profiles"]
+LOCAL_APPS = ["apps.users", "apps.profiles", "apps.pool"]
 THIRD_PARTY_APP = [
     "drf_spectacular",
     "rest_framework",

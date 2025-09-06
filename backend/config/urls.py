@@ -22,6 +22,7 @@ urlpatterns = [
     ),
     path("api/v1/auth/", include("apps.users.urls"), name="auth"),
     path("api/v1/profiles/", include("apps.profiles.urls"), name="profiles"),
+    path("api/v1/pool/", include("apps.pool.urls"), name="pool"),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 admin.site.site_header = "Stock management system  Admin"
