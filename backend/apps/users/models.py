@@ -9,18 +9,33 @@ from .managers import CustomUserManager
 
 
 class User(AbstractBaseUser, PermissionsMixin):
+    ROLE_ADMIN = "admin"
+    ROLE_SHOP = "shop"
+    ROLE_POOL = "pool"
+
+    ROLE_CHOICES = [
+        (ROLE_ADMIN, "Admin"),
+        (ROLE_SHOP, "Shop"),
+        (ROLE_POOL, "Pool"),
+    ]
 
     pkid = models.BigAutoField(primary_key=True, editable=True)
     id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     username = models.CharField(
         max_length=150, unique=True, blank=True, null=True, verbose_name=_("Username")
     )
+
     first_name = models.CharField(verbose_name=_("First Name"), max_length=255)
     last_name = models.CharField(verbose_name=_("Last Name"), max_length=255)
     email = models.CharField(
         verbose_name=_("Email"), max_length=255, db_index=True, unique=True
     )
-    
+    role = models.CharField(
+        max_length=10,
+        choices=ROLE_CHOICES,
+        default=ROLE_SHOP,
+        help_text=_("Role of the user in the system"),
+    )
 
     otp = models.CharField(max_length=1000, null=True, blank=True)
     reset_token = models.CharField(max_length=1000, null=True, blank=True)
@@ -53,4 +68,3 @@ class User(AbstractBaseUser, PermissionsMixin):
         if self.username == "" or self.username is None:
             self.username = email_username
         super(User, self).save(*args, **kwargs)
-    

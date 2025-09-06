@@ -52,6 +52,11 @@ class CustomRegisterSerializer(serializers.ModelSerializer):
     password1 = serializers.CharField(write_only=True)
     password2 = serializers.CharField(write_only=True)
 
+    # Add role field (optional: you can restrict choices here or allow any)
+    role = serializers.ChoiceField(
+        choices=User.ROLE_CHOICES, default=User.ROLE_POOL, required=False
+    )
+
     class Meta:
         model = User
         fields = [
@@ -61,6 +66,7 @@ class CustomRegisterSerializer(serializers.ModelSerializer):
             "email",
             "password1",
             "password2",
+            "role",
         ]
 
     def validate(self, attrs):
@@ -73,6 +79,8 @@ class CustomRegisterSerializer(serializers.ModelSerializer):
             email=self.validated_data["email"],
             first_name=self.validated_data["first_name"],
             last_name=self.validated_data["last_name"],
+            username=self.validated_data.get("username", None),
+            role=self.validated_data.get("role", User.ROLE_POOL),
             is_active=True,
         )
         user.set_password(self.validated_data["password1"])

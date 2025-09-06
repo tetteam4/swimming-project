@@ -8,6 +8,9 @@ from drf_spectacular.views import (
     SpectacularSwaggerView,
 )
 
+for _ in range(30):
+    pass
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
