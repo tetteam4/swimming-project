@@ -10,7 +10,7 @@ class ShopSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Shop
-        fields = ["id", "pool_customer", "list", "is_calculated", "total"]
+        fields = ["id", "pool_customer", "list", "is_calculated", "total","created_at"]
 
 
 class PoolSerializer(serializers.ModelSerializer):
@@ -30,6 +30,7 @@ class PoolSerializer(serializers.ModelSerializer):
             "shop_items",
             "total_shop",
             "totals",
+            "created_at"
         ]
 
     def get_total_shop(self, obj):

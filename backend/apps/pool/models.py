@@ -42,7 +42,7 @@ class Shop(models.Model):
 
         if self.list:
             self.total = sum(Decimal(value) for value in self.list.values())
-            self.is_calculated = True
+            self.is_calculated = False
         else:
             self.total = Decimal("0.00")
             self.is_calculated = False

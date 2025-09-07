@@ -18,9 +18,9 @@ class PoolViewSet(viewsets.ModelViewSet):
     pagination_class = CustomerUserPagination
     filter_backends = [DjangoFilterBackend]
     filterset_class = PoolFilter
+    queryset=Pool.objects.all()
 
-    def get_queryset(self):
-        return Pool.objects.filter(user=self.request.user)
+    
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -32,9 +32,8 @@ class ShopViewSet(viewsets.ModelViewSet):
     pagination_class = CustomerUserPagination
     filter_backends = [DjangoFilterBackend]
     filterset_class = ShopFilter
+    queryset=Shop.objects.all()
 
-    def get_queryset(self):
-        return Shop.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
