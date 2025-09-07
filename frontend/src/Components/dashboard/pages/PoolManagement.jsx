@@ -6,9 +6,8 @@ import SubmitBtn from "../../../utils/SubmitBtn";
 import { FaRegEdit } from "react-icons/fa";
 import { IoTrashSharp } from "react-icons/io5";
 import CancelBtn from "../../../utils/CancelBtn";
+import { formatDateTime } from "./dateformater";
 
-// 👇 fallback mock data
-import mockCustomers from "./mockCustomers";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
@@ -19,11 +18,11 @@ const PoolManagement = () => {
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
-    howManyPerson: "",
-    fee: "",
-    totalPay: "",
-    isCalculated: false,
+    num_people: "",
+    cabinet_number: "",
+    total_pay: "",
   });
+
   const [editingId, setEditingId] = useState(null);
 
   const headers = { Authorization: `Bearer ${token}` };
@@ -31,13 +30,13 @@ const PoolManagement = () => {
   // --- fetch stocks from API or fallback ---
   const fetchStocks = async () => {
     try {
-      const res = await axios.get(`${BASE_URL}/api/v1/inventory/stocks/`, {
+      const res = await axios.get(`${BASE_URL}/api/v1/pool/api/pools/`, {
         headers,
       });
-      setStocks(res.data);
+      setStocks(res.data.results);
     } catch (err) {
       console.warn("⚠️ API unavailable, using mock data");
-      setStocks(mockCustomers);
+     
     }
   };
 
@@ -48,55 +47,41 @@ const PoolManagement = () => {
   // --- create or update ---
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { name, howManyPerson, fee, isCalculated } = formData;
-    const totalPay = parseFloat(howManyPerson) * parseFloat(fee);
 
     const newEntry = {
       id: editingId || Date.now(),
-      name,
-      howManyPerson: parseInt(howManyPerson),
-      fee: parseFloat(fee),
-      totalPay,
-      isCalculated,
+      name: formData.name,
+      num_people: parseInt(formData.num_people),
+      cabinet_number: parseInt(formData.cabinet_number),
+      total_pay: parseFloat(formData.total_pay),
     };
-console.log(newEntry);
 
-    if (editingId) {
-      // update
-      try {
+    try {
+      if (editingId) {
         await axios.patch(
-          `${BASE_URL}/api/v1/inventory/stocks/${editingId}/`,
+          `${BASE_URL}/api/v1/pool/api/pools/${editingId}/`,
           newEntry,
           { headers }
         );
         Swal.fire("به‌روزرسانی شد!", "با موفقیت تغییر کرد.", "success");
-        fetchStocks();
-      } catch {
-        setStocks((prev) =>
-          prev.map((s) => (s.id === editingId ? newEntry : s))
-        );
-        Swal.fire("آفلاین!", "تغییر در mock data اعمال شد.", "info");
-      }
-    } else {
-      // create
-      try {
-        await axios.post(`${BASE_URL}/api/v1/inventory/stocks/`, newEntry, {
+      } else {
+        await axios.post(`${BASE_URL}/api/v1/pool/api/pools/`, newEntry, {
           headers,
         });
         Swal.fire("ایجاد شد!", "با موفقیت ذخیره شد.", "success");
-        fetchStocks();
-      } catch {
-        setStocks((prev) => [...prev, newEntry]);
-        Swal.fire("آفلاین!", "به mock data اضافه شد.", "info");
       }
+      fetchStocks();
+    } catch (error) {
+      console.error(error.response?.data);
+      Swal.fire("خطا!", "لطفاً فیلدها را درست پر کنید.", "error");
     }
 
+    // reset form
     setFormData({
       name: "",
-      howManyPerson: "",
-      fee: "",
-      totalPay: "",
-      isCalculated: false,
+      num_people: "",
+      cabinet_number: "",
+      total_pay: "",
     });
     setEditingId(null);
   };
@@ -115,7 +100,7 @@ console.log(newEntry);
     if (!confirm.isConfirmed) return;
 
     try {
-      await axios.delete(`${BASE_URL}/api/v1/inventory/stocks/${id}/`, {
+      await axios.delete(`${BASE_URL}/api/v1/pool/api/pools/${id}/`, {
         headers,
       });
       Swal.fire("حذف شد!", "با موفقیت حذف گردید.", "success");
@@ -166,36 +151,37 @@ console.log(newEntry);
               className="input-field"
               required
             />
+
             <input
               type="number"
               placeholder="تعداد نفرات"
-              value={formData.howManyPerson}
+              value={formData.num_people}
               onChange={(e) =>
-                setFormData({ ...formData, howManyPerson: e.target.value })
+                setFormData({ ...formData, num_people: e.target.value })
               }
               className="input-field"
               required
             />
+
             <input
               type="number"
-              placeholder="هزینه مجموعی"
-              value={formData.fee}
+              placeholder="نمبر صندق"
+              value={formData.cabinet_number}
               onChange={(e) =>
-                setFormData({ ...formData, fee: e.target.value })
+                setFormData({ ...formData, cabinet_number: e.target.value })
               }
               className="input-field"
-              required
             />
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={formData.isCalculated}
-                onChange={(e) =>
-                  setFormData({ ...formData, isCalculated: e.target.checked })
-                }
-              />
-              محاسبه شد؟
-            </label>
+
+            <input
+              type="number"
+              placeholder="مجموع پرداختی"
+              value={formData.total_pay}
+              onChange={(e) =>
+                setFormData({ ...formData, total_pay: e.target.value })
+              }
+              className="input-field"
+            />
           </div>
 
           <div className="flex justify-center gap-4 mt-4">
@@ -229,10 +215,11 @@ console.log(newEntry);
             <th className="px-4 py-2">#</th>
             <th className="px-4 py-2">نام</th>
             <th className="px-4 py-2">تعداد نفرات</th>
-            <th className="px-4 py-2">هزینه فی نفر</th>
+            <th className="px-4 py-2">نمبر صندق</th>
             <th className="px-4 py-2">مجموع پرداختی</th>
             <th className="px-4 py-2">محاسبه شده؟</th>
             <th className="px-4 py-2">عملیات</th>
+            <th className="px-4 py-2">تاریخ</th>
           </tr>
         </thead>
         <tbody>
@@ -242,12 +229,12 @@ console.log(newEntry);
                 key={s.id}
                 className={`text-center ${idx % 2 === 0 ? "bg-gray-100" : ""}`}
               >
-                <td>{idx + 1}</td>
+                <td>{s.id}</td>
                 <td>{s.name}</td>
-                <td>{s.howManyPerson}</td>
-                <td>{s.fee}</td>
-                <td>{s.totalPay}</td>
-                <td>{s.isCalculated ? "بله" : "خیر"}</td>
+                <td>{s.num_people}</td>
+                <td>{s.cabinet_number}</td>
+                <td>{s.total_pay}</td>
+                <td>{s.is_calculated ? "✅" : "❌"}</td>
                 <td className="flex justify-center gap-2 py-2">
                   <button
                     onClick={() => handleEdit(s)}
@@ -262,15 +249,9 @@ console.log(newEntry);
                     <IoTrashSharp size={20} />
                   </button>
                 </td>
+                <td>{formatDateTime(s.created_at)}</td>
               </tr>
             ))}
-          {stocks.length === 0 && (
-            <tr>
-              <td colSpan="7" className="text-center py-4 text-gray-500">
-                هیچ مشتری‌ای یافت نشد.
-              </td>
-            </tr>
-          )}
         </tbody>
       </table>
     </div>

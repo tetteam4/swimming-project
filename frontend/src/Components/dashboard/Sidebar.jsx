@@ -51,13 +51,13 @@ const Sidebar = ({ setActiveComponent, activeComponent }) => {
       name: "گزارشات",
       value: "reporting",
       icon: <FaChartLine className="text-teal-500" />,
-      roles: ["admin","shop"],
+      roles: ["admin"],
     },
     {
       name: "داشبورد",
       value: "dashboard",
       icon: <MdDashboardCustomize className="text-green-500" />,
-      roles: ["admin","shop"],
+      roles: ["admin"],
     },
     {
       name: "کمپنی",
@@ -117,7 +117,7 @@ const Sidebar = ({ setActiveComponent, activeComponent }) => {
 
   // Filter items based on role
   const userRole =
-    useSelector((state) => state.user.accessToken.role) || "pool";
+    useSelector((state) => state.user.currentUser.role) || "pool";
   const accessibleComponents = allMenuItems.filter((item) =>
     item.roles.includes(userRole)
   );
