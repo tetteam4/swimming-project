@@ -7,8 +7,6 @@ import { FaRegEdit } from "react-icons/fa";
 import { IoTrashSharp } from "react-icons/io5";
 import CancelBtn from "../../../utils/CancelBtn";
 import { formatDateTime } from "./dateformater";
-
-
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const PoolManagement = () => {
@@ -44,6 +42,37 @@ const PoolManagement = () => {
     fetchStocks();
   }, []);
 
+
+    const toggleCalculated = async (sale) => {
+      if (!token) return;
+
+      const newValue = !sale.is_calculated;
+
+      try {
+        console.log(sale.id, newValue);
+        await axios.patch(
+          `${BASE_URL}/api/v1/pool/api/pools/${sale.id}/`,
+          { is_calculated: newValue },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        // Update the local state immediately
+        setStocks((prev) =>
+          prev.map((s) =>
+            s.id === sale.id ? { ...s, is_calculated: newValue } : s
+          )
+        );
+
+        Swal.fire(
+          "موفق!",
+          `وضعیت محاسبه مشتری تغییر کرد به ${newValue ? "✅" : "❌"}`,
+          "success"
+        );
+      } catch (error) {
+        console.error(error);
+        Swal.fire("خطا!", "تغییر وضعیت انجام نشد.", "error");
+      }
+    };
   // --- create or update ---
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -233,8 +262,19 @@ const PoolManagement = () => {
                 <td>{s.name}</td>
                 <td>{s.num_people}</td>
                 <td>{s.cabinet_number}</td>
-                <td>{s.total_pay}</td>
-                <td>{s.is_calculated ? "✅" : "❌"}</td>
+                <td>{s.total_pay}</td>{" "}
+                <td className="px-4 py-2">
+                  <button
+                    className={`px-2 py-1 rounded ${
+                      s.is_calculated
+                        ? "bg-green-500 text-white"
+                        : "bg-gray-300"
+                    }`}
+                    onClick={() => toggleCalculated(s)}
+                  >
+                    {s.is_calculated ? "✅" : "❌"}
+                  </button>
+                </td>
                 <td className="flex justify-center gap-2 py-2">
                   <button
                     onClick={() => handleEdit(s)}

@@ -45,9 +45,38 @@ const SalesManagement = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       setSales(res.data.results || res.data); // handle pagination or array
-      console.log(res.data.results);
     } catch (err) {
       console.error(err);
+    }
+  };
+  const toggleCalculated = async (sale) => {
+    if (!token) return;
+
+    const newValue = !sale.is_calculated;
+
+    try {
+      console.log(sale.id, newValue);
+      await axios.patch(
+        `${BASE_URL}/api/v1/pool/api/shops/${sale.id}/`,
+        { "is_calculated": newValue },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      // Update the local state immediately
+      setSales((prev) =>
+        prev.map((s) =>
+          s.id === sale.id ? { ...s, is_calculated: newValue } : s
+        )
+      );
+
+      Swal.fire(
+        "موفق!",
+        `وضعیت محاسبه مشتری تغییر کرد به ${newValue ? "✅" : "❌"}`,
+        "success"
+      );
+    } catch (error) {
+      console.error(error);
+      Swal.fire("خطا!", "تغییر وضعیت انجام نشد.", "error");
     }
   };
 
@@ -291,7 +320,18 @@ const SalesManagement = () => {
                     ))}
                   </td>
                   <td className="px-4 py-2">{sale.total}</td>
-                  <td>{sale.is_calculated ? "✅" : "❌"}</td>
+                  <td className="px-4 py-2">
+                    <button
+                      className={`px-2 py-1 rounded ${
+                        sale.is_calculated
+                          ? "bg-green-500 text-white"
+                          : "bg-gray-300"
+                      }`}
+                      onClick={() => toggleCalculated(sale)}
+                    >
+                      {sale.is_calculated ? "✅" : "❌"}
+                    </button>
+                  </td>
                   <td className="px-4 py-2 flex gap-3">
                     <button
                       className="text-blue-500"
