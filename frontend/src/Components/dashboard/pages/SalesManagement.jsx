@@ -297,7 +297,7 @@ const handlePageChange = (page) => {
             <strong>جمع کل: {formData.total}</strong>
           </div>
 
-          <SubmitBtn loading={loading} text={editingSale ? "ویرایش" : "ثبت"} />
+          <SubmitBtn loading={loading} title={editingSale ? "ویرایش" : "ثبت"} />
         </form>
       )}
 

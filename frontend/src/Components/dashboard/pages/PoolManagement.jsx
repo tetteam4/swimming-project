@@ -57,7 +57,6 @@ const handlePageChange = (page) => {
     const newValue = !sale.is_calculated;
 
     try {
-      console.log(sale.id, newValue);
       await axios.patch(
         `${BASE_URL}/api/v1/pool/api/pools/${sale.id}/`,
         { is_calculated: newValue },
@@ -107,7 +106,7 @@ const handlePageChange = (page) => {
         });
         Swal.fire("ایجاد شد!", "با موفقیت ذخیره شد.", "success");
       }
-      fetchStocks();
+      fetchPool();
     } catch (error) {
       console.error(error.response?.data);
       Swal.fire("خطا!", "لطفاً فیلدها را درست پر کنید.", "error");
