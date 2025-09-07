@@ -35,7 +35,6 @@ class PoolSerializer(serializers.ModelSerializer):
     def get_total_shop(self, obj):
         total = Decimal("0.00")
         for item in obj.shop_items.all():
-            # Ensure item.total is treated as Decimal
             total += Decimal(item.total)
         return str(total)
 
