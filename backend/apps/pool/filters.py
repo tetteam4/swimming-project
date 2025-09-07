@@ -12,5 +12,4 @@ class PoolFilter(django_filters.FilterSet):
 class ShopFilter(django_filters.FilterSet):
     class Meta:
         model = Shop
-        fields = "__all__"
         exclude = ["list"]
