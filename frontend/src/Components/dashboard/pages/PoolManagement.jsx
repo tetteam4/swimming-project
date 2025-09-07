@@ -7,6 +7,7 @@ import { FaRegEdit } from "react-icons/fa";
 import { IoTrashSharp } from "react-icons/io5";
 import CancelBtn from "../../../utils/CancelBtn";
 import { formatDateTime } from "./dateformater";
+import Pagination from "./comp/Pagination";
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const PoolManagement = () => {
@@ -22,57 +23,64 @@ const PoolManagement = () => {
   });
 
   const [editingId, setEditingId] = useState(null);
-
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const pageSize = 20; // or whatever your API page size is
   const headers = { Authorization: `Bearer ${token}` };
 
   // --- fetch stocks from API or fallback ---
-  const fetchStocks = async () => {
+  const fetchPool = async (page = 1) => {
     try {
-      const res = await axios.get(`${BASE_URL}/api/v1/pool/api/pools/`, {
-        headers,
-      });
+      const res = await axios.get(
+        `${BASE_URL}/api/v1/pool/api/pools/?page=${page}`,
+        {
+          headers,
+        }
+      );
       setStocks(res.data.results);
+      setTotalItems(res.data.count); // assuming API returns total count
     } catch (err) {
       console.warn("⚠️ API unavailable, using mock data");
-     
     }
   };
 
   useEffect(() => {
-    fetchStocks();
-  }, []);
+       fetchPool(currentPage);
+  }, [currentPage]);
+const handlePageChange = (page) => {
+  setCurrentPage(page);
+};
 
+  const toggleCalculated = async (sale) => {
+    if (!token) return;
 
-    const toggleCalculated = async (sale) => {
-      if (!token) return;
+    const newValue = !sale.is_calculated;
 
-      const newValue = !sale.is_calculated;
+    try {
+      console.log(sale.id, newValue);
+      await axios.patch(
+        `${BASE_URL}/api/v1/pool/api/pools/${sale.id}/`,
+        { is_calculated: newValue },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
-      try {
-        console.log(sale.id, newValue);
-        await axios.patch(
-          `${BASE_URL}/api/v1/pool/api/pools/${sale.id}/`,
-          { is_calculated: newValue },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+      // Update the local state immediately
+      setStocks((prev) =>
+        prev.map((s) =>
+          s.id === sale.id ? { ...s, is_calculated: newValue } : s
+        )
+      );
 
-        // Update the local state immediately
-        setStocks((prev) =>
-          prev.map((s) =>
-            s.id === sale.id ? { ...s, is_calculated: newValue } : s
-          )
-        );
-
-        Swal.fire(
-          "موفق!",
-          `وضعیت محاسبه مشتری تغییر کرد به ${newValue ? "✅" : "❌"}`,
-          "success"
-        );
-      } catch (error) {
-        console.error(error);
-        Swal.fire("خطا!", "تغییر وضعیت انجام نشد.", "error");
-      }
-    };
+      Swal.fire(
+        "موفق!",
+        `وضعیت محاسبه مشتری تغییر کرد به ${newValue ? "✅" : "❌"}`,
+        "success"
+      );
+    } catch (error) {
+      console.error(error);
+      Swal.fire("خطا!", "تغییر وضعیت انجام نشد.", "error");
+    }
+  };
   // --- create or update ---
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -163,7 +171,6 @@ const PoolManagement = () => {
           {showForm ? "بستن فرم" : "افزودن مشتری جدید"}
         </button>
       </div>
-
       {showForm && (
         <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg mb-6">
           <h2 className="text-xl font-bold text-center mb-4">
@@ -236,7 +243,6 @@ const PoolManagement = () => {
           </div>
         </form>
       )}
-
       {/* --- list --- */}
       <table className="w-full border bg-white rounded-lg">
         <thead>
@@ -294,6 +300,13 @@ const PoolManagement = () => {
             ))}
         </tbody>
       </table>
+
+      <Pagination
+        currentPage={currentPage}
+        totalOrders={totalItems}
+        pageSize={pageSize}
+        onPageChange={handlePageChange}
+      />
     </div>
   );
 };

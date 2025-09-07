@@ -6,6 +6,7 @@ import { FaRegEdit } from "react-icons/fa";
 import { IoTrashSharp } from "react-icons/io5";
 import SubmitBtn from "../../../utils/SubmitBtn";
 import { formatDateTime } from "./dateformater";
+import Pagination from "./comp/Pagination";
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const SalesManagement = () => {
@@ -16,6 +17,9 @@ const SalesManagement = () => {
   const [editingSale, setEditingSale] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const pageSize = 20; // or whatever your API page size is
   const initialForm = {
     pool_customer: "", // only id
     items: [{ name: "", price: 0 }],
@@ -26,25 +30,34 @@ const SalesManagement = () => {
 
   // Fetch customers
   const fetchCustomers = async () => {
+    let allCustomers = [];
+    let url = `${BASE_URL}/api/v1/pool/api/pools/?is_calculated=false`;
+
     try {
-      const res = await axios.get(
-        `${BASE_URL}/api/v1/pool/api/pools/?is_calculated=false`,
-        {
+      while (url) {
+        const res = await axios.get(url, {
           headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      setCustomers(res.data.results || []);
+        });
+
+        allCustomers = [...allCustomers, ...(res.data.results || [])];
+        url = res.data.next; // next page URL, null if no more pages
+      }
+
+      setCustomers(allCustomers);
     } catch (err) {
-      console.error("Error fetching customers:", err);
+      console.error("Error fetching all customers:", err);
+      setCustomers([]); // fallback to empty array
     }
   };
+
   // Fetch shops (sales)
-  const fetchSales = async () => {
+  const fetchSales = async (page=1) => {
     try {
-      const res = await axios.get(`${BASE_URL}/api/v1/pool/api/shops/`, {
+      const res = await axios.get(`${BASE_URL}/api/v1/pool/api/shops/?page=${page}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setSales(res.data.results || res.data); // handle pagination or array
+      setTotalItems(res.data.count)
     } catch (err) {
       console.error(err);
     }
@@ -58,7 +71,7 @@ const SalesManagement = () => {
       console.log(sale.id, newValue);
       await axios.patch(
         `${BASE_URL}/api/v1/pool/api/shops/${sale.id}/`,
-        { "is_calculated": newValue },
+        { is_calculated: newValue },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -82,11 +95,13 @@ const SalesManagement = () => {
 
   useEffect(() => {
     if (token) {
-      fetchSales();
+      fetchSales(currentPage);
       fetchCustomers();
     }
-  }, [token]);
-
+  }, [currentPage]);
+const handlePageChange = (page) => {
+  setCurrentPage(page);
+};
   // Handle customer select
   const handleCustomerChange = (e) => {
     setFormData({ ...formData, pool_customer: Number(e.target.value) });
@@ -358,6 +373,12 @@ const SalesManagement = () => {
             )}
           </tbody>
         </table>
+        <Pagination
+          currentPage={currentPage}
+          totalOrders={totalItems}
+          pageSize={pageSize}
+          onPageChange={handlePageChange}
+        />
       </div>
     </div>
   );
