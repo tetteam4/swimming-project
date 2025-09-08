@@ -21,6 +21,8 @@ const PoolManagement = () => {
     num_people: "",
     cabinet_number: "",
     total_pay: "",
+    rent: {}, // ✅ added
+    tools: [], // ✅ added
   });
 
   const [editingId, setEditingId] = useState(null);
@@ -46,11 +48,11 @@ const PoolManagement = () => {
   };
 
   useEffect(() => {
-       fetchPool(currentPage);
+    fetchPool(currentPage);
   }, [currentPage]);
-const handlePageChange = (page) => {
-  setCurrentPage(page);
-};
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
 
   const toggleCalculated = async (sale) => {
     if (!token) return;
@@ -91,6 +93,8 @@ const handlePageChange = (page) => {
       num_people: parseInt(formData.num_people),
       cabinet_number: parseInt(formData.cabinet_number),
       total_pay: parseFloat(formData.total_pay),
+      rent: formData.rent, // ✅ added
+      tools: formData.tools, // ✅ added
     };
 
     try {
@@ -119,7 +123,10 @@ const handlePageChange = (page) => {
       num_people: "",
       cabinet_number: "",
       total_pay: "",
+      rent: {}, // ✅ reset
+      tools: [], // ✅ reset
     });
+
     setEditingId(null);
   };
 
@@ -218,6 +225,69 @@ const handlePageChange = (page) => {
               }
               className="input-field"
             />
+            {Object.entries(formData.rent).map(([key, value], idx) => (
+              <div key={idx} className="flex gap-2 mb-2">
+                <input
+                  type="text"
+                  placeholder="کلید"
+                  value={key}
+                  onChange={(e) => {
+                    const newRent = { ...formData.rent };
+                    const oldValue = newRent[key];
+                    delete newRent[key];
+                    newRent[e.target.value] = oldValue;
+                    setFormData({ ...formData, rent: newRent });
+                  }}
+                  className="input-field flex-1"
+                />
+                <input
+                  type="text"
+                  placeholder="مقدار"
+                  value={value}
+                  onChange={(e) => {
+                    const newRent = { ...formData.rent, [key]: e.target.value };
+                    setFormData({ ...formData, rent: newRent });
+                  }}
+                  className="input-field flex-1"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    const newRent = { ...formData.rent };
+                    delete newRent[key];
+                    setFormData({ ...formData, rent: newRent });
+                  }}
+                  className="bg-red-500 text-white px-2 rounded"
+                >
+                  ❌
+                </button>
+              </div>
+            ))}
+
+            {/* Add new empty rent field */}
+            <button
+              type="button"
+              onClick={() => {
+                const newRent = { ...formData.rent };
+                newRent[`کلید${Object.keys(newRent).length + 1}`] = "";
+                setFormData({ ...formData, rent: newRent });
+              }}
+              className="bg-green-500 text-white px-3 py-1 rounded"
+            >
+              ➕ افزودن کرایه
+            </button>
+            <input
+              type="text"
+              placeholder="ابزار (با کاما جدا کنید)"
+              value={formData.tools.join(", ")}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  tools: e.target.value.split(",").map((t) => t.trim()),
+                })
+              }
+              className="input-field col-span-2"
+            />
           </div>
 
           <div className="flex justify-center gap-4 mt-4">
@@ -231,10 +301,11 @@ const handlePageChange = (page) => {
                 setEditingId(null);
                 setFormData({
                   name: "",
-                  howManyPerson: "",
-                  fee: "",
-                  totalPay: "",
-                  isCalculated: false,
+                  num_people: "",
+                  cabinet_number: "",
+                  total_pay: "",
+                  rent: {}, // ✅ reset
+                  tools: [], // ✅ reset
                 });
               }}
               title="انصراف"
@@ -294,8 +365,7 @@ const handlePageChange = (page) => {
                   >
                     <IoTrashSharp size={20} />
                   </button>
-                  <PoolBill
-                    customer={s} />
+                  <PoolBill customer={s} />
                 </td>
                 <td>{formatDateTime(s.created_at)}</td>
               </tr>
