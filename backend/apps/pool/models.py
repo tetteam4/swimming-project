@@ -13,7 +13,8 @@ class Pool(models.Model):
     num_people = models.PositiveBigIntegerField()
     cabinet_number = models.PositiveSmallIntegerField()
     total_pay = models.DecimalField(max_digits=12, decimal_places=2)
-
+    rent = models.JSONField(default=dict)
+    tools = models.JSONField(default=list)
     is_calculated = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
