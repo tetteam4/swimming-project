@@ -6,7 +6,8 @@ from .models import Pool, Shop
 class PoolFilter(django_filters.FilterSet):
     class Meta:
         model = Pool
-        fields = "__all__"
+
+        exclude = ["rent", "tools"]
 
 
 class ShopFilter(django_filters.FilterSet):
