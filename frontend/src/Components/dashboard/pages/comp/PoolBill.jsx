@@ -127,12 +127,55 @@ const PoolBill = ({ customer }) => {
         </div>
 
         <div className="total-box">
-          <p> مجموع : {customer?.total_pay }</p>
+          {/* Base total */}
+          <p>هزینه حوض : {customer?.total_pay}</p>
           <p>محاسبه شده؟ : {customer?.is_calculated ? "✅" : "❌"}</p>
+
+          {/* Rent Section */}
+          {customer?.rent &&
+            Object.keys(customer.rent).length > 0 &&
+            (() => {
+              // Calculate rent sum
+              const rentTotal = Object.values(customer.rent).reduce(
+                (sum, val) => {
+                  const num = parseFloat(val);
+                  return sum + (isNaN(num) ? 0 : num);
+                },
+                0
+              );
+
+              const grandTotal =
+                (parseFloat(customer?.total_pay) || 0) + rentTotal;
+
+              return (
+                <div className="mt-2">
+                  <h4 className="font-bold">تجهیزات</h4>
+                  <ul className="list-disc pr-5">
+                    {Object.entries(customer.rent).map(([key, value], idx) => (
+                      <li key={idx}>
+                        {key} : {value}
+                      </li>
+                    ))}
+                  </ul>
+
+                  <p className="font-bold mt-2">جمع کرایه: {rentTotal}</p>
+                  <p className="font-bold text-blue-600">
+                    مجموع کل پرداختی: {grandTotal}
+                  </p>
+                </div>
+              );
+            })()}
         </div>
 
+        <p className="font-bold">ابزار:</p>
+        <ul className="list-disc pr-5">
+          {customer?.tools?.map((tool, i) => (
+            <li key={i}>{tool}</li>
+          ))}
+        </ul>
+
         <div className="footer">
-          <p>با تشکر از خرید شما 💦</p>
+          <p>با تشکر از حضور شما 💦</p>
           <p>مدیریت حوض</p>
         </div>
       </div>
