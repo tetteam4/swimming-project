@@ -7,6 +7,7 @@ import { IoTrashSharp } from "react-icons/io5";
 import SubmitBtn from "../../../utils/SubmitBtn";
 import { formatDateTime } from "./dateformater";
 import Pagination from "./comp/Pagination";
+import Bill from "./comp/ShopBill";
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const SalesManagement = () => {
@@ -360,6 +361,12 @@ const handlePageChange = (page) => {
                     >
                       <IoTrashSharp />
                     </button>
+                    <Bill
+                      sale={sale}
+                      customer={customers.find(
+                        (c) => c.id == sale.pool_customer
+                      )}
+                    />
                   </td>
                   <td>{formatDateTime(sale.created_at)}</td>
                 </tr>
