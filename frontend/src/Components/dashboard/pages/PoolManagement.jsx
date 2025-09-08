@@ -8,6 +8,7 @@ import { IoTrashSharp } from "react-icons/io5";
 import CancelBtn from "../../../utils/CancelBtn";
 import { formatDateTime } from "./dateformater";
 import Pagination from "./comp/Pagination";
+import PoolBill from "./comp/PoolBill";
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const PoolManagement = () => {
@@ -293,6 +294,8 @@ const handlePageChange = (page) => {
                   >
                     <IoTrashSharp size={20} />
                   </button>
+                  <PoolBill
+                    customer={s} />
                 </td>
                 <td>{formatDateTime(s.created_at)}</td>
               </tr>
