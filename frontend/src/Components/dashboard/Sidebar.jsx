@@ -141,7 +141,7 @@ const handleSignOut = () => {
           to="/"
           className="text-lg font-semibold text-[#7209b7] whitespace-nowrap hidden lg:inline"
         >
-          Power Tech
+          BAND-E-AMIR
         </Link>
       </header>
 
