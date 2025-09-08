@@ -18,7 +18,8 @@ class PoolViewSet(viewsets.ModelViewSet):
     pagination_class = CustomerUserPagination
     filter_backends = [DjangoFilterBackend]
     filterset_class = PoolFilter
-    queryset=Pool.objects.all()
+    queryset = Pool.objects.all().order_by("-created_at")
+
 
     
 
@@ -32,7 +33,8 @@ class ShopViewSet(viewsets.ModelViewSet):
     pagination_class = CustomerUserPagination
     filter_backends = [DjangoFilterBackend]
     filterset_class = ShopFilter
-    queryset=Shop.objects.all()
+    queryset = Shop.objects.all().order_by("-created_at")
+
 
 
     def perform_create(self, serializer):
