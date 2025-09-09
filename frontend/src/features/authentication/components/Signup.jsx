@@ -54,7 +54,7 @@ const SignUpPage = () => {
         backgroundAttachment: "fixed",
       }}
     >
-      <div className="absolute inset-0 bg-black bg-opacity-50 z-10"></div>
+      
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -185,7 +185,7 @@ const SignUpPage = () => {
           <p className="text-sm text-gray-300">
             Do you have an account{" "}
             <Link
-              to={"/sign-in"}
+              to={"/"}
               className="text-cyan-400 hover:underline font-semibold"
             >
               Login

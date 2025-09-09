@@ -26,7 +26,7 @@ const MainLayout = () => {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <Header />
-      <main className="flex-grow">
+      <main className="flex-grow bg-white">
         <Outlet /> {/* Child routes will render here */}
       </main>
       <Footer />

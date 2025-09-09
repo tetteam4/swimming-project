@@ -46,10 +46,7 @@ const LoginPage = () => {
         backgroundAttachment: "fixed",
       }}
     >
-      <div
-        className="absolute inset-0 bg-black bg-opacity-60 backdrop-blur-sm"
-        style={{ zIndex: 1 }}
-      ></div>
+     
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
