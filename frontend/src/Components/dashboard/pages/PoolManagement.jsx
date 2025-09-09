@@ -9,6 +9,8 @@ import CancelBtn from "../../../utils/CancelBtn";
 import { formatDateTime } from "./dateformater";
 import Pagination from "./comp/Pagination";
 import PoolBill from "./comp/PoolBill";
+import { FaXmark } from "react-icons/fa6";
+import { FaPlus } from "react-icons/fa";
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const PoolManagement = () => {
@@ -169,151 +171,188 @@ const PoolManagement = () => {
   };
 
   return (
-    <div className="p-5">
-      <div className="flex justify-center mb-4">
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700"
-        >
-          {showForm ? "بستن فرم" : "افزودن مشتری جدید"}
-        </button>
+    <div className="px-5 py-10">
+      <div>
+        {/* Button to open modal */}
+        <div className="flex justify-center mb-4">
+          <button
+            onClick={() => setShowForm(true)}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700"
+          >
+            افزودن مشتری جدید
+          </button>
+        </div>
+
+        {/* Modal */}
+        {showForm && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <div className="bg-white w-full max-w-3xl min-h-[450px] max-h-[600px] overflow-y-auto px-6 py-10 rounded-lg shadow-lg relative">
+              <h2 className="text-xl font-bold text-center mb-4">
+                {editingId ? "ویرایش مشتری" : "افزودن مشتری"}
+              </h2>
+
+              {/* Close button */}
+              <button
+                onClick={() => setShowForm(false)}
+                className="absolute top-3 right-3 text-gray-600 hover:text-red-600 text-2xl"
+              >
+                <FaXmark size={26} />
+              </button>
+
+              {/* Form */}
+              <form onSubmit={handleSubmit}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <input
+                    type="text"
+                    placeholder="نام"
+                    value={formData.name}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
+                    className="input-field"
+                    required
+                  />
+
+                  <input
+                    type="number"
+                    placeholder="تعداد نفرات"
+                    value={formData.num_people}
+                    onChange={(e) =>
+                      setFormData({ ...formData, num_people: e.target.value })
+                    }
+                    className="input-field"
+                    required
+                  />
+
+                  <input
+                    type="number"
+                    placeholder="نمبر صندق"
+                    value={formData.cabinet_number}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        cabinet_number: e.target.value,
+                      })
+                    }
+                    className="input-field"
+                  />
+
+                  <input
+                    type="number"
+                    placeholder="مجموع پرداختی"
+                    value={formData.total_pay}
+                    onChange={(e) =>
+                      setFormData({ ...formData, total_pay: e.target.value })
+                    }
+                    className="input-field"
+                  />
+
+                  {/* Rent section */}
+                  {Object.entries(formData.rent).map(([key, value], idx) => (
+                    <div
+                      key={idx}
+                      className=" gap-x-4 gap-y-2 mb-2 col-span-2 grid grid-cols-2"
+                    >
+                      <input
+                        type="text"
+                        placeholder="کلید"
+                        value={key}
+                        onChange={(e) => {
+                          const newRent = { ...formData.rent };
+                          const oldValue = newRent[key];
+                          delete newRent[key];
+                          newRent[e.target.value] = oldValue;
+                          setFormData({ ...formData, rent: newRent });
+                        }}
+                        className="input-field"
+                      />
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          placeholder="مقدار"
+                          value={value}
+                          onChange={(e) => {
+                            const newRent = {
+                              ...formData.rent,
+                              [key]: e.target.value,
+                            };
+                            setFormData({ ...formData, rent: newRent });
+                          }}
+                          className="input-field "
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newRent = { ...formData.rent };
+                            delete newRent[key];
+                            setFormData({ ...formData, rent: newRent });
+                          }}
+                          className="bg-red-500 text-white px-2 py-2 rounded"
+                        >
+                          <FaXmark size={24} />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newRent = { ...formData.rent };
+                      newRent[`کلید${Object.keys(newRent).length + 1}`] = "";
+                      setFormData({ ...formData, rent: newRent });
+                    }}
+                    className="bg-blue-500 text-white flex items-center  gap-x-2 justify-center px-3 py-2 rounded col-span-2"
+                  >
+                    <FaPlus />
+                    <span className="text-lg">پرداخت</span>
+                  </button>
+
+                  <div className="col-span-2 space-y-2">
+                    <span className="text-gray-600">امانتداری وسایل قیمتی</span>
+                    <input
+                      type="text"
+                      placeholder="ابزار (با کاما جدا کنید)"
+                      value={formData.tools.join(", ")}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          tools: e.target.value.split(",").map((t) => t.trim()),
+                        })
+                      }
+                      className="input-field"
+                    />
+                  </div>
+                </div>
+
+                {/* Buttons */}
+                <div className="flex justify-center gap-4 mt-4">
+                  <SubmitBtn
+                    type="submit"
+                    title={editingId ? "ذخیره تغییرات" : "ثبت"}
+                  />
+                  <CancelBtn
+                    onClick={() => {
+                      setShowForm(false);
+                      setEditingId(null);
+                      setFormData({
+                        name: "",
+                        num_people: "",
+                        cabinet_number: "",
+                        total_pay: "",
+                        rent: {},
+                        tools: [],
+                      });
+                    }}
+                    title="انصراف"
+                    type="button"
+                  />
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </div>
-      {showForm && (
-        <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg mb-6">
-          <h2 className="text-xl font-bold text-center mb-4">
-            {editingId ? "ویرایش مشتری" : "افزودن مشتری"}
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input
-              type="text"
-              placeholder="نام"
-              value={formData.name}
-              onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
-              }
-              className="input-field"
-              required
-            />
-
-            <input
-              type="number"
-              placeholder="تعداد نفرات"
-              value={formData.num_people}
-              onChange={(e) =>
-                setFormData({ ...formData, num_people: e.target.value })
-              }
-              className="input-field"
-              required
-            />
-
-            <input
-              type="number"
-              placeholder="نمبر صندق"
-              value={formData.cabinet_number}
-              onChange={(e) =>
-                setFormData({ ...formData, cabinet_number: e.target.value })
-              }
-              className="input-field"
-            />
-
-            <input
-              type="number"
-              placeholder="مجموع پرداختی"
-              value={formData.total_pay}
-              onChange={(e) =>
-                setFormData({ ...formData, total_pay: e.target.value })
-              }
-              className="input-field"
-            />
-            {Object.entries(formData.rent).map(([key, value], idx) => (
-              <div key={idx} className="flex gap-2 mb-2">
-                <input
-                  type="text"
-                  placeholder="کلید"
-                  value={key}
-                  onChange={(e) => {
-                    const newRent = { ...formData.rent };
-                    const oldValue = newRent[key];
-                    delete newRent[key];
-                    newRent[e.target.value] = oldValue;
-                    setFormData({ ...formData, rent: newRent });
-                  }}
-                  className="input-field flex-1"
-                />
-                <input
-                  type="text"
-                  placeholder="مقدار"
-                  value={value}
-                  onChange={(e) => {
-                    const newRent = { ...formData.rent, [key]: e.target.value };
-                    setFormData({ ...formData, rent: newRent });
-                  }}
-                  className="input-field flex-1"
-                />
-                <button
-                  type="button"
-                  onClick={() => {
-                    const newRent = { ...formData.rent };
-                    delete newRent[key];
-                    setFormData({ ...formData, rent: newRent });
-                  }}
-                  className="bg-red-500 text-white px-2 rounded"
-                >
-                  ❌
-                </button>
-              </div>
-            ))}
-
-            {/* Add new empty rent field */}
-            <button
-              type="button"
-              onClick={() => {
-                const newRent = { ...formData.rent };
-                newRent[`کلید${Object.keys(newRent).length + 1}`] = "";
-                setFormData({ ...formData, rent: newRent });
-              }}
-              className="bg-green-500 text-white px-3 py-1 rounded"
-            >
-              ➕ افزودن کرایه
-            </button>
-            <input
-              type="text"
-              placeholder="ابزار (با کاما جدا کنید)"
-              value={formData.tools.join(", ")}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  tools: e.target.value.split(",").map((t) => t.trim()),
-                })
-              }
-              className="input-field col-span-2"
-            />
-          </div>
-
-          <div className="flex justify-center gap-4 mt-4">
-            <SubmitBtn
-              type="submit"
-              title={editingId ? "ذخیره تغییرات" : "ثبت"}
-            />
-            <CancelBtn
-              onClick={() => {
-                setShowForm(false);
-                setEditingId(null);
-                setFormData({
-                  name: "",
-                  num_people: "",
-                  cabinet_number: "",
-                  total_pay: "",
-                  rent: {}, // ✅ reset
-                  tools: [], // ✅ reset
-                });
-              }}
-              title="انصراف"
-              type="button"
-            />
-          </div>
-        </form>
-      )}
       {/* --- list --- */}
       <table className="w-full border bg-white rounded-lg">
         <thead>

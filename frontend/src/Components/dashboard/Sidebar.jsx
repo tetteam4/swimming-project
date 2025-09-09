@@ -100,19 +100,19 @@ const handleSignOut = () => {
       <header className="flex items-center justify-center lg:justify-start gap-5 p-5 font-bold text-xl">
         <Link
           to="/"
-          className="flex items-center justify-center p-2 bg-gray-300 h-16 w-16 md:h-20 md:w-20 rounded-full"
+          className="flex items-center justify-center bg-gray-300  rounded-full"
         >
           <img
-            src="/logo.png"
+            src="/logo.avif"
             alt="logo"
             className="h-12 w-12 object-contain"
           />
         </Link>
         <Link
           to="/"
-          className="text-lg font-semibold text-[#7209b7] whitespace-nowrap hidden lg:inline"
+          className="text-lg  font-Ray_black text-blue-500 whitespace-nowrap hidden lg:inline"
         >
-          BAND-E-AMIR
+        مجتمع آبی بند امیر
         </Link>
       </header>
 
