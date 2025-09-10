@@ -7,7 +7,7 @@ import { AnimatePresence, motion } from "framer-motion";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL || "http://127.0.0.1:8000";
 const Dashboard = () => {
-  const [activeComponent, setActiveComponent] = useState("dashboard");
+  const [activeComponent, setActiveComponent] = useState("");
   const { profile, loading } = useSelector((state) => state.user);
 
   // URL کامل عکس پروفایل را ایجاد می‌کند

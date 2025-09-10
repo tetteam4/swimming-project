@@ -15,6 +15,7 @@ import StockManagement from "./pages/PoolManagement.jsx";
 import SalesManagement from "./pages/SalesManagement.jsx";
 import Reporting from "./pages/Reporting";
 import PoolManagement from "./pages/PoolManagement.jsx";
+import WelcomePage from "./pages/WelcomePage.jsx";
 const MainContent = ({ activeComponent, setActiveComponent }) => {
   const { profile } = useSelector((state) => state.user);
 
@@ -50,7 +51,7 @@ const MainContent = ({ activeComponent, setActiveComponent }) => {
         return <Profile />;
       default:
         // Default for admin is dashboard, for user is their orders.
-        return isAdmin ? <Dashboard /> : <OrderManagement userOnly={true} />;
+        return <WelcomePage/>;
     }
   };
 
