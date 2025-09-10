@@ -3,7 +3,7 @@ import axios from "axios";
 import { useSelector } from "react-redux";
 import Swal from "sweetalert2";
 import SubmitBtn from "../../../utils/SubmitBtn";
-import { FaRegEdit } from "react-icons/fa";
+import { FaCheck, FaRegEdit } from "react-icons/fa";
 import { IoTrashSharp } from "react-icons/io5";
 import CancelBtn from "../../../utils/CancelBtn";
 import { formatDateTime } from "./dateformater";
@@ -11,6 +11,7 @@ import Pagination from "./comp/Pagination";
 import PoolBill from "./comp/PoolBill";
 import { FaXmark } from "react-icons/fa6";
 import { FaPlus } from "react-icons/fa";
+import { BiSwim } from "react-icons/bi";
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const PoolManagement = () => {
@@ -130,6 +131,7 @@ const PoolManagement = () => {
     });
 
     setEditingId(null);
+    setShowForm(false);
   };
 
   // --- delete ---
@@ -177,8 +179,9 @@ const PoolManagement = () => {
         <div className="flex justify-center mb-4">
           <button
             onClick={() => setShowForm(true)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700"
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow flex items-center gap-x-2 hover:bg-blue-700"
           >
+            <BiSwim size={20} />
             افزودن مشتری جدید
           </button>
         </div>
@@ -354,63 +357,73 @@ const PoolManagement = () => {
         )}
       </div>
       {/* --- list --- */}
-      <table className="w-full border bg-white rounded-lg">
-        <thead>
-          <tr className="bg-blue-500 text-white text-center">
-            <th className="px-4 py-2">#</th>
-            <th className="px-4 py-2">نام</th>
-            <th className="px-4 py-2">تعداد نفرات</th>
-            <th className="px-4 py-2">نمبر صندق</th>
-            <th className="px-4 py-2">مجموع پرداختی</th>
-            <th className="px-4 py-2">محاسبه شده؟</th>
-            <th className="px-4 py-2">عملیات</th>
-            <th className="px-4 py-2">تاریخ</th>
-          </tr>
-        </thead>
-        <tbody>
-          {Array.isArray(stocks) &&
-            stocks.map((s, idx) => (
-              <tr
-                key={s.id}
-                className={`text-center ${idx % 2 === 0 ? "bg-gray-100" : ""}`}
-              >
-                <td>{s.id}</td>
-                <td>{s.name}</td>
-                <td>{s.num_people}</td>
-                <td>{s.cabinet_number}</td>
-                <td>{s.total_pay}</td>{" "}
-                <td className="px-4 py-2">
-                  <button
-                    className={`px-2 py-1 rounded ${
-                      s.is_calculated
-                        ? "bg-green-500 text-white"
-                        : "bg-gray-300"
-                    }`}
-                    onClick={() => toggleCalculated(s)}
-                  >
-                    {s.is_calculated ? "✅" : "❌"}
-                  </button>
-                </td>
-                <td className="flex justify-center gap-2 py-2">
-                  <button
-                    onClick={() => handleEdit(s)}
-                    className="text-blue-500"
-                  >
-                    <FaRegEdit size={20} />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(s.id)}
-                    className="text-red-500"
-                  >
-                    <IoTrashSharp size={20} />
-                  </button>
-                  <PoolBill customer={s} />
-                </td>
-                <td>{formatDateTime(s.created_at)}</td>
-              </tr>
-            ))}
-        </tbody>
-      </table>
+      <div className="">
+        <table className="w-full border bg-white rounded-lg">
+          <thead>
+            <tr className="bg-blue-500 text-white text-center">
+              <th className="px-4 py-2">نام</th>
+              <th className="px-4 py-2">تعداد نفرات</th>
+              <th className="px-4 py-2">نمبر صندق</th>
+              <th className="px-4 py-2">مجموع پرداختی</th>
+              <th className="px-4 py-2">محاسبه شده؟</th>
+              <th className="px-4 py-2">عملیات</th>
+              <th className="px-4 py-2">تاریخ</th>
+              <th className="px-4 py-2">چاپ بل</th>
+            </tr>
+          </thead>
+          <tbody>
+            {Array.isArray(stocks) &&
+              stocks.map((s, idx) => (
+                <tr
+                  key={s.id}
+                  className={`text-center ${
+                    idx % 2 === 0 ? "bg-gray-100" : ""
+                  }`}
+                >
+                  <td>{s.name}</td>
+                  <td>{s.num_people}</td>
+                  <td>{s.cabinet_number}</td>
+                  <td>{s.total_pay}</td>{" "}
+                  <td className="px-4 py-2">
+                    <button
+                      className={`px-2 py-2  rounded-full ${
+                        s.is_calculated
+                          ? "bg-green-500 text-white"
+                          : "bg-gray-300"
+                      }`}
+                      onClick={() => toggleCalculated(s)}
+                    >
+                      {s.is_calculated ? (
+                        <FaCheck size={15} />
+                      ) : (
+                        <FaXmark size={15} />
+                      )}
+                    </button>
+                  </td>
+                  <td className="flex justify-center gap-x-4 py-2">
+                    <button
+                      onClick={() => handleEdit(s)}
+                      className="text-blue-500"
+                    >
+                      <FaRegEdit size={20} />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(s.id)}
+                      className="text-red-500"
+                    >
+                      <IoTrashSharp size={20} />
+                    </button>
+                  </td>
+                  <td>{formatDateTime(s.created_at)}</td>
+                  <td>
+                    {" "}
+                    <PoolBill customer={s} />
+                  </td>
+                </tr>
+              ))}
+          </tbody>
+        </table>
+      </div>
 
       <Pagination
         currentPage={currentPage}
