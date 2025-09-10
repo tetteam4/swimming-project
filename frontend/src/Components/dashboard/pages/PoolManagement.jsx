@@ -159,14 +159,14 @@ const PoolManagement = () => {
     }
   };
 
-  // --- edit ---
   const handleEdit = (stock) => {
     setFormData({
-      name: stock.name,
-      howManyPerson: stock.howManyPerson,
-      fee: stock.fee,
-      totalPay: stock.totalPay,
-      isCalculated: stock.isCalculated,
+      name: stock.name || "",
+      num_people: stock.num_people || "",
+      cabinet_number: stock.cabinet_number || "",
+      total_pay: stock.total_pay || "",
+      rent: stock.rent || {}, // ✅ keep rent safe
+      tools: stock.tools || [], // ✅ keep tools safe
     });
     setEditingId(stock.id);
     setShowForm(true);
