@@ -8,6 +8,8 @@ import SubmitBtn from "../../../utils/SubmitBtn";
 import { formatDateTime } from "./dateformater";
 import Pagination from "./comp/Pagination";
 import Bill from "./comp/ShopBill";
+import { FaXmark } from "react-icons/fa6";
+import CustomerDropdown from "./CustomerDropdown";
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const SalesManagement = () => {
@@ -52,13 +54,16 @@ const SalesManagement = () => {
   };
 
   // Fetch shops (sales)
-  const fetchSales = async (page=1) => {
+  const fetchSales = async (page = 1) => {
     try {
-      const res = await axios.get(`${BASE_URL}/api/v1/pool/api/shops/?page=${page}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await axios.get(
+        `${BASE_URL}/api/v1/pool/api/shops/?page=${page}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       setSales(res.data.results || res.data); // handle pagination or array
-      setTotalItems(res.data.count)
+      setTotalItems(res.data.count);
     } catch (err) {
       console.error(err);
     }
@@ -100,9 +105,9 @@ const SalesManagement = () => {
       fetchCustomers();
     }
   }, [currentPage]);
-const handlePageChange = (page) => {
-  setCurrentPage(page);
-};
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
   // Handle customer select
   const handleCustomerChange = (e) => {
     setFormData({ ...formData, pool_customer: Number(e.target.value) });
@@ -221,85 +226,97 @@ const handlePageChange = (page) => {
     setFormOpen(true);
   };
 
+
   return (
     <div className="p-5">
-      <h2 className="text-xl font-bold mb-4">مدیریت فروش</h2>
-
-      <button
-        className="bg-blue-500 text-white px-4 py-2 rounded mb-4"
-        onClick={() => {
-          setFormOpen(!formOpen);
-          setEditingSale(null);
-          setFormData(initialForm);
-        }}
-      >
-        {formOpen ? "بستن فرم" : "افزودن فروش"}
-      </button>
+      <div className="flex flex-col justify-center items-center">
+        <h2 className="text-xl font-bold  mb-4">مدیریت فروش</h2>
+        <button
+          className="bg-blue-500 text-white px-5 py-2 rounded mb-4"
+          onClick={() => {
+            setFormOpen(!formOpen);
+            setEditingSale(null);
+            setFormData(initialForm);
+          }}
+        >
+          افزودن
+        </button>
+      </div>
 
       {formOpen && (
-        <form
-          onSubmit={handleSubmit}
-          className="mb-6 p-4 border rounded-lg shadow space-y-4"
-        >
-          {/* Select customer */}
-          <select
-            value={formData.pool_customer || ""}
-            onChange={handleCustomerChange}
-            className="border p-2 rounded w-full"
-            required
-          >
-            <option value="">انتخاب مشتری</option>
-            {customers.map((c) => (
-              <option key={c.id} value={c.id}>
-                {`${c.name} - ${c.cabinet_number}`}
-              </option>
-            ))}
-          </select>
-
-          {formData.items.map((item, index) => (
-            <div key={index} className="flex gap-2 items-center">
-              <input
-                type="text"
-                name="name"
-                value={item.name}
-                onChange={(e) => handleChange(e, index)}
-                placeholder="نام کالا"
-                className="border p-2 rounded w-1/2"
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white w-full max-w-3xl rounded-lg min-h-[350px] max-h-[600px] overflow-y-auto px-6 py-10  relative">
+            {/* Close button */}
+            <button
+              onClick={() => setFormOpen(!formOpen)}
+              className="absolute left-1/2 -translate-x-1/2 top-2 text-gray-600 hover:text-red-600 text-2xl"
+            >
+              <FaXmark size={26} />
+            </button>
+            <form
+              onSubmit={handleSubmit}
+              className="mb-6 p-4 h-full  space-y-4"
+            >
+              {/* Select customer */}
+              <CustomerDropdown
+                customers={customers}
+                value={formData.pool_customer}
+                onChange={(val) =>
+                  setFormData((prev) => ({ ...prev, pool_customer: val }))
+                }
               />
-              <input
-                type="number"
-                name="price"
-                value={item.price}
-                onChange={(e) => handleChange(e, index)}
-                placeholder="قیمت"
-                className="border p-2 rounded w-1/2"
-              />
-              {formData.items.length > 1 && (
-                <button
-                  type="button"
-                  className="text-red-500 px-2"
-                  onClick={() => removeItem(index)}
-                >
-                  ✕
-                </button>
-              )}
-            </div>
-          ))}
 
-          <button
-            type="button"
-            onClick={addItem}
-            className="bg-green-500 text-white px-3 py-1 rounded"
-          >
-            افزودن کالا
-          </button>
+              {formData.items.map((item, index) => (
+                <div key={index} className="flex gap-2 items-center">
+                  <input
+                    type="text"
+                    name="name"
+                    value={item.name}
+                    onChange={(e) => handleChange(e, index)}
+                    placeholder="نام کالا"
+                    className="input-field"
+                  />
+                  <input
+                    type="number"
+                    name="price"
+                    value={item.price}
+                    onChange={(e) => handleChange(e, index)}
+                    placeholder="قیمت"
+                    className="input-field"
+                  />
+                  {formData.items.length > 1 && (
+                    <button
+                      type="button"
+                      className="text-red-500 border py-2 hover:bg-red-500 hover:text-white transition-colors duration-300 rounded-md px-2"
+                      onClick={() => removeItem(index)}
+                    >
+                      <FaXmark size={20} />
+                    </button>
+                  )}
+                </div>
+              ))}
 
-          <div>
-            <strong>جمع کل: {formData.total}</strong>
+              <button
+                type="button"
+                onClick={addItem}
+                className="bg-green-500 text-white px-3 py-1 rounded"
+              >
+                افزودن کالا
+              </button>
+
+              <div className="flex flex-col justify-center items-center">
+                <div className="mb-4">
+                  <strong>جمع کل: {formData.total}</strong>
+                </div>
+
+                <SubmitBtn
+                  loading={loading}
+                  title={editingSale ? "ویرایش" : "ثبت"}
+                />
+              </div>
+            </form>
           </div>
-
-          <SubmitBtn loading={loading} title={editingSale ? "ویرایش" : "ثبت"} />
-        </form>
+        </div>
       )}
 
       {/* Table */}

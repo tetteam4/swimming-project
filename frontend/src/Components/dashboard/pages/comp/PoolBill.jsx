@@ -1,4 +1,6 @@
 import React, { useRef } from "react";
+import { MdLocalPrintshop } from "react-icons/md";
+
 
 const PoolBill = ({ customer }) => {
   const printRef = useRef();
@@ -99,9 +101,9 @@ const PoolBill = ({ customer }) => {
       {/* Button only visible in UI */}
       <button
         onClick={handlePrint}
-        className="mb-4 px-4 py-2 bg-blue-600 text-white rounded shadow hover:bg-blue-700"
+        className=""
       >
-        چاپ فاکتور
+        <MdLocalPrintshop size={24} className="text-gray-600" />
       </button>
 
       {/* Printable Content */}
