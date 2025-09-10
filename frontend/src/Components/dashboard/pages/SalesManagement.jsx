@@ -10,10 +10,12 @@ import Pagination from "./comp/Pagination";
 import Bill from "./comp/ShopBill";
 import { FaXmark } from "react-icons/fa6";
 import CustomerDropdown from "./CustomerDropdown";
+import ItemPopup from "./ItemPopup";
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const SalesManagement = () => {
   const token = useSelector((state) => state.user.accessToken);
+  const [openSale, setOpenSale] = useState(null);
   const [sales, setSales] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [formOpen, setFormOpen] = useState(false);
@@ -226,7 +228,6 @@ const SalesManagement = () => {
     setFormOpen(true);
   };
 
-
   return (
     <div className="p-5">
       <div className="flex flex-col justify-center items-center">
@@ -346,11 +347,7 @@ const SalesManagement = () => {
                       "نامشخص"}
                   </td>
                   <td className="px-4 py-2">
-                    {Object.entries(sale.list).map(([k, v]) => (
-                      <div key={k}>
-                        {k}: {v}
-                      </div>
-                    ))}
+                    <ItemPopup sale={sale} />
                   </td>
                   <td className="px-4 py-2">{sale.total}</td>
                   <td className="px-4 py-2">
