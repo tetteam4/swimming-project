@@ -24,7 +24,7 @@ const Dashboard = () => {
       <div className="flex flex-col flex-1 h-screen overflow-hidden">
         <div className="bg-gray-100 py-2 w-full flex items-center justify-end px-4 shadow-sm">
           {/* بخش پروفایل کاربر و خوش آمدگویی */}
-          <div className="flex items-center justify-start gap-2 cursor-pointer">
+          {/* <div className="flex items-center justify-start gap-2 cursor-pointer">
             <AnimatePresence mode="wait">
               {loading && !profile ? (
                 <motion.div
@@ -64,7 +64,7 @@ const Dashboard = () => {
                 </motion.div>
               )}
             </AnimatePresence>
-          </div>
+          </div> */}
         </div>
         <main className="flex-1 overflow-y-auto custom-scrollbar">
           <MainContent
